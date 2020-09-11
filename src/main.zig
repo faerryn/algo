@@ -1,16 +1,16 @@
 const std = @import("std");
 
-pub fn binaryQuickSort(comptime T: type, items: []T, context: anytype, at: fn (@TypeOf(context), T, usize) ?bool) void {
-    return bqs_internal(T, items, context, at, 0);
+pub fn binaryQuickSort(comptime T: type, items: []T, context: anytype, leftBucketAt: fn (@TypeOf(context), T, usize) ?bool) void {
+    bqs_internal(T, items, context, leftBucketAt, 0);
 }
 
-fn bqs_internal(comptime T: type, items: []T, context: anytype, at: fn (@TypeOf(context), T, usize) ?bool, index: usize) void {
+fn bqs_internal(comptime T: type, items: []T, context: anytype, leftBucketAt: fn (@TypeOf(context), T, usize) ?bool, index: usize) void {
     if (items.len <= 1) return;
     var left: usize = 0;
     var right = items.len - 1;
     var unfinished: usize = 0;
     while (left <= right) {
-        const side = at(context, items[left], index);
+        const side = leftBucketAt(context, items[left], index);
         if (side != null) unfinished += 1;
         if (side orelse true) {
             left += 1;
@@ -21,8 +21,8 @@ fn bqs_internal(comptime T: type, items: []T, context: anytype, at: fn (@TypeOf(
         }
     }
     if (unfinished > 0) {
-        bqs_internal(T, items[0..left], context, at, index + 1);
-        bqs_internal(T, items[left..], context, at, index + 1);
+        bqs_internal(T, items[0..left], context, leftBucketAt, index + 1);
+        bqs_internal(T, items[left..], context, leftBucketAt, index + 1);
     }
 }
 
