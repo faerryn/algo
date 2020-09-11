@@ -39,6 +39,18 @@ test "bqs u32" {
     testing.expect(std.sort.isSorted(u32, &items, {}, asc_u32));
 }
 
+const asc_i32 = std.sort.asc(i32);
+fn at_asc_i32(context: void, x: i32, i: usize) ?bool {
+    if (i > 31) return null;
+    const mask = @shlExact(@intCast(u32, 1), 31 - @intCast(u5, i));
+    return (i == 0) != (@bitCast(u32, x) & mask == 0);
+}
+test "bqs i32" {
+    var items = [_]i32{ 4, -3, 2, -7, 2, -9, -2, 5 };
+    binaryQuickSort(i32, &items, {}, at_asc_i32);
+    testing.expect(std.sort.isSorted(i32, &items, {}, asc_i32));
+}
+
 fn at_asc_str(context: void, x: []const u8, i: usize) ?bool {
     const index = @divTrunc(i, 8);
     const offset = @truncate(u3, i);
