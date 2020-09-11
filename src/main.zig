@@ -52,6 +52,7 @@ test "bqs str" {
         "roaming",
         "caterpillar",
         "roaring",
+        "roaring",
         "fire",
         "cat",
         "firefighter",
@@ -65,6 +66,7 @@ test "bqs str" {
         "roam",
         "roaming",
         "roar",
+        "roaring",
         "roaring",
     };
     binaryQuickSort([]const u8, &items, {}, at_asc_str);
