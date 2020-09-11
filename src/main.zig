@@ -15,12 +15,12 @@ fn bqs_internal(comptime T: type, items: []T, context: anytype, at: fn (@TypeOf(
         if (side orelse true) {
             left += 1;
         } else {
-            std.mem.swap(u32, &items[right], &items[left]);
+            std.mem.swap(T, &items[right], &items[left]);
             if (right == 0) break;
             right -= 1;
         }
     }
-    if (unfinished > 1) {
+    if (unfinished > 0) {
         bqs_internal(T, items[0..left], context, at, index + 1);
         bqs_internal(T, items[left..], context, at, index + 1);
     }
@@ -37,4 +37,36 @@ test "bqs u32" {
     var items = [_]u32{ 4, 3, 2, 7, 2, 9, 2, 5 };
     binaryQuickSort(u32, &items, {}, at_asc_u32);
     testing.expect(std.sort.isSorted(u32, &items, {}, asc_u32));
+}
+
+fn at_asc_str(context: void, x: []const u8, i: usize) ?bool {
+    const index = @divTrunc(i, 8);
+    const offset = @truncate(u3, i);
+    if (index >= x.len) return null;
+    const mask = @shlExact(@intCast(u8, 1), 7 - offset);
+    return x[index] & mask == 0;
+}
+test "bqs str" {
+    var items = [_][]const u8{
+        "roar",
+        "roaming",
+        "caterpillar",
+        "roaring",
+        "fire",
+        "cat",
+        "firefighter",
+        "roam",
+    };
+    const solution = [_][]const u8{
+        "cat",
+        "caterpillar",
+        "fire",
+        "firefighter",
+        "roam",
+        "roaming",
+        "roar",
+        "roaring",
+    };
+    binaryQuickSort([]const u8, &items, {}, at_asc_str);
+    testing.expectEqual(solution, items);
 }
