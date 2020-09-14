@@ -6,17 +6,14 @@ pub fn binaryQuickSort(comptime T: type, items: []T, context: anytype, leftBucke
 
 fn bqsi(comptime T: type, items: []T, context: anytype, leftBucketAt: fn (@TypeOf(context), T, usize) ?bool, index: usize) void {
     if (items.len <= 1) return;
+    var finished: usize = 0;
     var left: usize = 0;
     var right = items.len - 1;
-    var finished: usize = 0;
-    var unfinished: usize = 0;
     while (left <= right) {
         const side = leftBucketAt(context, items[left], index);
         if (side == null) {
             std.mem.swap(T, &items[left], &items[finished]);
             finished += 1;
-        } else {
-            unfinished += 1;
         }
         if (side orelse true) {
             left += 1;
@@ -26,7 +23,7 @@ fn bqsi(comptime T: type, items: []T, context: anytype, leftBucketAt: fn (@TypeO
             right -= 1;
         }
     }
-    if (unfinished > 0) {
+    if (finished < items.len) {
         bqsi(T, items[0..left], context, leftBucketAt, index + 1);
         bqsi(T, items[left..], context, leftBucketAt, index + 1);
     }
@@ -102,11 +99,19 @@ fn leftBucketAtAscU32Arr(context: void, x: []const u32, i: usize) ?bool {
 test "bqs []u32" {
     var items = [_][]const u32{
         &[_]u32{ 0, 0, 0 },
+        &[_]u32{ 0, 0 },
         &[_]u32{0},
+        &[_]u32{ 1, 2, 3, 0, 0, 0 },
+        &[_]u32{ 1, 2, 3, 0, 0 },
+        &[_]u32{ 1, 2, 3, 0 },
     };
     const solution = [_][]const u32{
         &[_]u32{0},
+        &[_]u32{ 0, 0 },
         &[_]u32{ 0, 0, 0 },
+        &[_]u32{ 1, 2, 3, 0 },
+        &[_]u32{ 1, 2, 3, 0, 0 },
+        &[_]u32{ 1, 2, 3, 0, 0, 0 },
     };
     binaryQuickSort([]const u32, &items, {}, leftBucketAtAscU32Arr);
 
